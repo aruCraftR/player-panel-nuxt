@@ -4,6 +4,7 @@ definePageMeta({ title: '玩家设置' })
 
 const { user, userLogout } = useAuth()
 const toast = useToast()
+const loading = ref(false)
 
 const formSchema = z.object({
     password: z.string('请填写密码').min(8, '密码必须超过8位').optional()
@@ -15,6 +16,7 @@ const formState = reactive<Partial<FormSchema>>({
 })
 
 const saveProfile = async () => {
+    loading.value = true
     if (formState.password) {
         if (formState.password.length <= 8) {
             toast.add({ title: '密码必须超过8位', color: 'warning' })
@@ -23,8 +25,10 @@ const saveProfile = async () => {
         const response = await useApi('post', '/player/change_password', { 'password': formState.password })
         if (response.code === 200) {
             toast.add({ title: '密码已更改', color: 'success' })
+            formState.password = ''
         }
     }
+    loading.value = false
 }
 </script>
 
@@ -54,7 +58,7 @@ const saveProfile = async () => {
                     </UFormField>
 
                     <div class="flex justify-end">
-                        <UButton @click="saveProfile">保存更改</UButton>
+                        <UButton :disabled="loading" @click="saveProfile">保存更改</UButton>
                     </div>
                 </UForm>
             </div>

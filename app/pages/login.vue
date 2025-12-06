@@ -6,7 +6,7 @@ definePageMeta({
     title: '登录 - aruCraftR'
 })
 
-const { startCooldown, cooldown, setLoginSuccess } = useAuth()
+const { startCooldown, cooldown, setLoginSuccess, token } = useAuth()
 const toast = useToast()
 const loading = ref(false)
 
@@ -32,6 +32,7 @@ const captchaState = reactive<Partial<CaptchaSchema>>({
 })
 
 const passwordLogin = async () => {
+    if (token.value) { navigateTo('/'); return }
     loading.value = true
     const response: ApiResponse<LoginResponse> = await useApi('post', '/login/password', { 'player_id': passwordState.player_id, 'password': passwordState.password })
     if (response.code === 200 && response.data !== null) {
@@ -43,6 +44,7 @@ const passwordLogin = async () => {
 
 
 const captchaLogin = async () => {
+    if (token.value) { navigateTo('/'); return }
     loading.value = true
     const response: ApiResponse<LoginResponse> = await useApi('post', '/login/captcha', { 'player_id': captchaState.player_id, 'captcha': captchaState.captcha })
     if (response.code === 200 && response.data !== null) {
@@ -53,6 +55,7 @@ const captchaLogin = async () => {
 }
 
 const sendCaptcha = async () => {
+    if (token.value) { navigateTo('/'); return }
     loading.value = true
     if (!captchaState.player_id) {
         toast.add({ title: '请输入正版ID', color: 'error' })
@@ -65,7 +68,7 @@ const sendCaptcha = async () => {
     startCooldown()
     const response = await useApi('post', '/login/send_captcha', { 'player_id': captchaState.player_id })
     if (response.code === 200) {
-        toast.add({ title: '验证码已发送', color: 'success', description: '请查看服务器聊天栏以获取验证码' })
+        toast.add({ title: '验证码已发送', color: 'success', description: '请查看服务器聊天栏以获取验证码', duration: 10000 })
     } else {
         cooldown.value = 5
     }
@@ -98,7 +101,8 @@ const items = [
                                 class="w-full" />
                         </UFormField>
 
-                        <UButton :disabled="loading" type="submit" class="w-full justify-center items-center">
+                        <UButton :disabled="loading || Boolean(token)" type="submit"
+                            class="w-full justify-center items-center">
                             登录
                         </UButton>
                     </UForm>
@@ -121,7 +125,8 @@ const items = [
                             </div>
                         </UFormField>
 
-                        <UButton :disabled="loading" type="submit" class="w-full justify-center items-center">
+                        <UButton :disabled="loading || Boolean(token)" type="submit"
+                            class="w-full justify-center items-center">
                             验证并登录
                         </UButton>
                     </UForm>
