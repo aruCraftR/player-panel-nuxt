@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import '~/assets/css/login.css'
 import * as z from 'zod'
 import type { ApiResponse, LoginResponse } from '~/types/api'
 definePageMeta({
