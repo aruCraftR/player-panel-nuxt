@@ -4,7 +4,7 @@ import type { ApiResponse, ServerInfo } from '~/types/api';
 
 definePageMeta({ title: '服务器列表' })
 
-const { servers, lastFetchServerListTimestamp } = useUi()
+const { serverList, lastFetchServerListTimestamp, isServerListLoaded } = useUi()
 type Colors = "neutral" | "primary" | "secondary" | "success" | "info" | "warning" | "error"
 const statusColors: Map<string, Colors> = new Map([
     ['active', 'success'],
@@ -31,7 +31,8 @@ const updateServers = async () => {
     try {
         const response: ApiResponse<ServerInfo[]> = await useApi('get', '/server/list')
         if (response.data !== null) {
-            servers.value = response.data
+            serverList.value = response.data
+            isServerListLoaded.value = true
         }
     } finally {
         if (isPageActivated) {
@@ -39,6 +40,7 @@ const updateServers = async () => {
         }
     }
 }
+
 
 onMounted(() => {
     isPageActivated = true
@@ -53,8 +55,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <UCard v-for="server in servers" :key="server.id" class="hover:shadow-lg transition-shadow duration-300 p-0">
+    <UPageHero v-if="!isServerListLoaded" headline="稍安勿躁哦" title="正在获取服务器列表" description="CloudFlare在国内的访问速度可能偏慢" />
+    <div v-else-if="serverList.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <UCard v-for="server in serverList" :key="server.id" class="hover:shadow-lg transition-shadow duration-300 p-0">
 
             <div class="p-4">
                 <UPopover arrow mode="hover" :open-delay=300>
@@ -94,4 +97,5 @@ onUnmounted(() => {
             </div>
         </UCard>
     </div>
+    <UPageHero v-else-if="serverList.length == 0" headline="啊嘞?" title="没有服务器在线" description="或许有什么特殊状况?" />
 </template>
