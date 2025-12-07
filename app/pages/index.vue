@@ -57,7 +57,7 @@ onUnmounted(() => {
         <UCard v-for="server in servers" :key="server.id" class="hover:shadow-lg transition-shadow duration-300 p-0">
 
             <div class="p-4">
-                <UPopover arrow mode="click" :open-delay=300>
+                <UPopover arrow mode="hover" :open-delay=300>
                     <div class="flex cursor-pointer">
                         <div class="flex-1">
                             <h3 class="text-lg font-bold mb-2">{{ server.id }}</h3>
@@ -74,7 +74,7 @@ onUnmounted(() => {
                         </UBadge>
                     </div>
                     <template #content>
-                        <div v-if="server.players.length > 0" class="space-y-2 p-3 grid grid-cols-2">
+                        <div v-if="server.players.length > 0" class="p-3 grid grid-cols-2 gap-2">
                             <UUser v-for="player in server.players" :key="player.player_id" :name="player?.player_id"
                                 :avatar="{
                                     src: `https://avatars.cloudhaven.gg/avatars/${player?.uuid || '853c80ef3c3749fdaa49938b674adae6'}`
