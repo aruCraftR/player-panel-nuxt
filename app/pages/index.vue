@@ -56,46 +56,50 @@ onUnmounted(() => {
 
 <template>
     <UPageHero v-if="!isServerListLoaded" headline="稍安勿躁哦" title="正在获取服务器列表" description="CloudFlare在国内的访问速度可能偏慢" />
-    <div v-else-if="serverList.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <UCard v-for="server in serverList" :key="server.id" class="hover:shadow-lg transition-shadow duration-300 p-0">
+    <div v-else-if="serverList.length > 0" class="space-y-5">
+        <UBanner title="点击对应卡片可查看玩家列表" icon="i-lucide-info" class="rounded-xl" color="primary" />
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <UCard v-for="server in serverList" :key="server.id"
+                class="hover:shadow-lg transition-shadow duration-300 p-0">
 
-            <div class="p-4">
-                <UPopover arrow mode="hover" :open-delay=300>
-                    <div class="flex cursor-pointer">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-bold mb-2">{{ server.id }}</h3>
+                <div class="p-4">
+                    <UPopover arrow mode="click">
+                        <div class="flex cursor-pointer">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold mb-2">{{ server.id }}</h3>
 
-                            <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
-                                <div class="flex items-center gap-1">
-                                    <UIcon name="i-heroicons-users" />
-                                    <span>{{ server.player_count }} / {{ server.max_players }}</span>
+                                <div class="flex justify-between items-center text-sm text-gray-500 mb-4">
+                                    <div class="flex items-center gap-1">
+                                        <UIcon name="i-heroicons-users" />
+                                        <span>{{ server.player_count }} / {{ server.max_players }}</span>
+                                    </div>
                                 </div>
                             </div>
+                            <UBadge class="h-min" :color="statusColors.get(server.status) || 'neutral'" variant="solid">
+                                {{ statusText.get(server.status) || '状态未知' }}
+                            </UBadge>
                         </div>
-                        <UBadge class="h-min" :color="statusColors.get(server.status) || 'neutral'" variant="solid">
-                            {{ statusText.get(server.status) || '状态未知' }}
-                        </UBadge>
+                        <template #content>
+                            <div v-if="server.players.length > 0" class="p-3 grid grid-cols-2 gap-2">
+                                <UUser v-for="player in server.players" :key="player.player_id"
+                                    :name="player?.player_id" :avatar="{
+                                        src: `https://avatars.cloudhaven.gg/avatars/${player?.uuid || '853c80ef3c3749fdaa49938b674adae6'}`
+                                    }" alt="Avatar" size="sm" />
+                            </div>
+                            <div v-else class="p-3">
+                                没有玩家呢
+                            </div>
+                        </template>
+                    </UPopover>
+
+                    <UProgress size="xs" :color="statusColors.get(server.status) || 'neutral'" />
+
+                    <div class="mt-4 flex gap-2">
+                        <UButton block variant="soft" :disabled="server.status !== 'active'">进入聊天</UButton>
                     </div>
-                    <template #content>
-                        <div v-if="server.players.length > 0" class="p-3 grid grid-cols-2 gap-2">
-                            <UUser v-for="player in server.players" :key="player.player_id" :name="player?.player_id"
-                                :avatar="{
-                                    src: `https://avatars.cloudhaven.gg/avatars/${player?.uuid || '853c80ef3c3749fdaa49938b674adae6'}`
-                                }" alt="Avatar" size="sm" />
-                        </div>
-                        <div v-else class="p-3">
-                            没有玩家呢
-                        </div>
-                    </template>
-                </UPopover>
-
-                <UProgress size="xs" :color="statusColors.get(server.status) || 'neutral'" />
-
-                <div class="mt-4 flex gap-2">
-                    <UButton block variant="soft" :disabled="server.status !== 'active'">进入聊天</UButton>
                 </div>
-            </div>
-        </UCard>
+            </UCard>
+        </div>
     </div>
     <UPageHero v-else-if="serverList.length == 0" headline="啊嘞?" title="没有服务器在线" description="或许有什么特殊状况?" />
 </template>
