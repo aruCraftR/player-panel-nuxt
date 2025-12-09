@@ -152,6 +152,7 @@ const items = [
                         <UButton variant="link">注册账户</UButton>
                         <template #body>
                             在QQ群内绑定正版ID后自动完成注册
+                            首次登录只能使用验证码登录(需要在服务器内上线), 登录后即可进入玩家设置修改密码
                         </template>
                     </UModal>
                     <UModal title="忘记密码怎么办" close>
