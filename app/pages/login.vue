@@ -34,24 +34,30 @@ const captchaState = reactive<Partial<CaptchaSchema>>({
 const passwordLogin = async () => {
     if (token.value) { navigateTo('/'); return }
     loading.value = true
-    const response: ApiResponse<LoginResponse> = await useApi('post', '/login/password', { 'player_id': passwordState.player_id, 'password': passwordState.password })
-    if (response.code === 200 && response.data !== null) {
-        toast.add({ title: '登录成功', description: `欢迎回到aruCraftR, ${response.data.user.player_id}`, color: 'success', icon: 'i-heroicons-check-circle' })
-        setLoginSuccess(response.data)
+    try {
+        const response: ApiResponse<LoginResponse> = await useApi('post', '/login/password', { 'player_id': passwordState.player_id, 'password': passwordState.password })
+        if (response.code === 200 && response.data !== null) {
+            toast.add({ title: '登录成功', description: `欢迎回到aruCraftR, ${response.data.user.player_id}`, color: 'success', icon: 'i-heroicons-check-circle' })
+            setLoginSuccess(response.data)
+        }
+    } finally {
+        loading.value = false
     }
-    loading.value = false
 }
 
 
 const captchaLogin = async () => {
     if (token.value) { navigateTo('/'); return }
     loading.value = true
-    const response: ApiResponse<LoginResponse> = await useApi('post', '/login/captcha', { 'player_id': captchaState.player_id, 'captcha': captchaState.captcha })
-    if (response.code === 200 && response.data !== null) {
-        toast.add({ title: '登录成功', description: `欢迎回到aruCraftR, ${response.data.user.player_id}`, color: 'success', icon: 'i-heroicons-check-circle' })
-        setLoginSuccess(response.data)
+    try {
+        const response: ApiResponse<LoginResponse> = await useApi('post', '/login/captcha', { 'player_id': captchaState.player_id, 'captcha': captchaState.captcha })
+        if (response.code === 200 && response.data !== null) {
+            toast.add({ title: '登录成功', description: `欢迎回到aruCraftR, ${response.data.user.player_id}`, color: 'success', icon: 'i-heroicons-check-circle' })
+            setLoginSuccess(response.data)
+        }
+    } finally {
+        loading.value = false
     }
-    loading.value = false
 }
 
 const sendCaptcha = async () => {
@@ -66,13 +72,18 @@ const sendCaptcha = async () => {
         return
     }
     startCooldown()
-    const response = await useApi('post', '/login/send_captcha', { 'player_id': captchaState.player_id })
-    if (response.code === 200) {
-        toast.add({ title: '验证码已发送', color: 'success', description: '请查看服务器聊天栏以获取验证码', duration: 10000 })
-    } else {
+    try {
+        const response = await useApi('post', '/login/send_captcha', { 'player_id': captchaState.player_id })
+        if (response.code === 200) {
+            toast.add({ title: '验证码已发送', color: 'success', description: '请查看服务器聊天栏以获取验证码', duration: 10000 })
+        } else {
+            cooldown.value = 5
+        }
+    } catch {
         cooldown.value = 5
+    } finally {
+        loading.value = false
     }
-    loading.value = false
 }
 
 
