@@ -12,8 +12,8 @@ export interface LoginResponse {
     user: AuthedPlayerInfo;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AuthedPlayerInfo extends BasePlayerInfo {
+    permission: number;
 }
 
 export interface BasePlayerInfo {
