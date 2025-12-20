@@ -91,7 +91,9 @@ const getCardMenuItems = (serverInfo: ServerInfo, serverProfile: ServerProfile):
                         <div class="flex flex-row">
                             <div class="flex flex-1 gap-2 mb-2">
                                 <h3 class="text-lg font-bold">
-                                    {{ serverProfile.zh_cn_name || serverProfile.en_ww_name }}
+                                    <span v-if="serverProfile.zh_cn_name">{{ serverProfile.zh_cn_name }}</span>
+                                    <span v-else-if="serverProfile.en_ww_name">{{ serverProfile.en_ww_name }}</span>
+                                    <span v-else>{{ serverInfo.id }}</span>
                                 </h3>
                                 <span v-if="serverProfile.server_version" class="text-sm text-gray-500 self-end mb-0.5">
                                     v{{ serverProfile.server_version }}
