@@ -4,6 +4,7 @@ import type { LoginResponse, AuthedPlayerInfo } from '~/types/api'
  * 用户认证与授权逻辑
  */
 export const useAuth = () => {
+    const { usePanelApi } = useApi()
     // 1. Token: 使用 Cookie 持久化，以便 SSR 也能获取
     const token = useCookie<string | null>('auth_token', {
         maxAge: 60 * 60 * 24 + 3600 // 25小时
@@ -62,7 +63,7 @@ export const useAuth = () => {
      */
     const logout = () => {
         token.value = null
-        user.value = { player_id: '', uuid: '', qq_id: '' }
+        user.value = { player_id: '', uuid: '', qq_id: '', permission: 0 }
         navigateTo('/login')
         return
     }
@@ -71,13 +72,13 @@ export const useAuth = () => {
      * 退出登录
      */
     const userLogout = async () => {
-        const response = await useApi('get', '/player/logout')
+        const response = await usePanelApi('get', '/player/logout')
         console.log(response.data)
         if (response.data === null) {
             useToast().add({ title: '成功登出', color: 'success' })
         }
         token.value = null
-        user.value = { player_id: '', uuid: '', qq_id: '' }
+        user.value = { player_id: '', uuid: '', qq_id: '', permission: 0 }
         navigateTo('/login')
         return
     }

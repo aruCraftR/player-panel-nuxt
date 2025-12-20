@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // types/api.d.ts
 
+type Colors = "neutral" | "primary" | "secondary" | "success" | "info" | "warning" | "error"
+
 export interface ApiResponse<T = any> {
     code: number;
     msg: string;
@@ -26,10 +28,21 @@ type ServerStatus = 'active' | 'starting' | 'stopping' | 'stopped' | 'unresponsi
 
 export interface ServerInfo {
     id: string
+    profile_time: number
     status: ServerStatus
     max_players: number
     player_count: number
     players: BasePlayerInfo[]
+}
+
+export interface ServerProfile {
+    server_id: string;
+    edit_time: number;
+    zh_cn_name?: string;
+    en_ww_name?: string;
+    mc_version?: string;
+    server_version?: string;
+    announcement?: string;
 }
 
 

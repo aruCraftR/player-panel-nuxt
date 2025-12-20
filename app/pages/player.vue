@@ -4,6 +4,7 @@ import type { ApiResponse, PlayerProfile } from '~/types/api'
 definePageMeta({ title: '玩家设置' })
 
 const { user, userLogout } = useAuth()
+const { usePanelApi } = useApi()
 const toast = useToast()
 const loading = ref(true)
 const showOnlineSuffixPrev = ref(false)
@@ -31,7 +32,7 @@ const saveProfile = async () => {
             return
         }
         try {
-            const response = await useApi('post', '/player/change_password', { 'password': formState.password })
+            const response = await usePanelApi('post', '/player/change_password', { 'password': formState.password })
             if (response.code === 200) {
                 toast.add({ title: '密码已更改', color: 'success' })
                 formState.password = ''
@@ -51,7 +52,7 @@ const saveProfile = async () => {
     }
     if (Object.keys(updatedProfile).length !== 0) {
         try {
-            const response = await useApi('post', '/player/update_profile', updatedProfile)
+            const response = await usePanelApi('post', '/player/update_profile', updatedProfile)
             if (response.code === 200) {
                 toast.add({ title: '个人设置已更新', color: 'success' })
             }
@@ -64,7 +65,7 @@ const saveProfile = async () => {
 
 const loadProfile = async () => {
     loading.value = true
-    const response: ApiResponse<PlayerProfile> = await useApi('get', '/player/profile')
+    const response: ApiResponse<PlayerProfile> = await usePanelApi('get', '/player/profile')
     if (response.code === 200) {
         oldProfile = response.data
         formState.online_qq_suffix = response.data?.online_qq_suffix
@@ -96,13 +97,13 @@ onMounted(() => {
                         <UFormField label="绑定QQ">
                             <UInput :model-value="user?.qq_id" disabled />
                         </UFormField>
-                        <UFormField label="更改密码">
+                        <UFormField label="更改密码" name="password">
                             <UInput v-model="formState.password" placeholder="若不需要更改密码可留空" type="password" />
                         </UFormField>
                     </div>
                     <div class="flex space-x-6">
                         <UTooltip :delay-duration="0" :open="showOnlineSuffixPrev">
-                            <UFormField label="在线QQ后缀">
+                            <UFormField label="在线QQ后缀" name="online_qq_suffix">
                                 <UInput v-model="formState.online_qq_suffix" placeholder="| {s}在线"
                                     @pointerenter="showOnlineSuffixPrev = true"
                                     @pointerleave="showOnlineSuffixPrev = false" />
@@ -113,7 +114,7 @@ onMounted(() => {
                             </template>
                         </UTooltip>
                         <UTooltip :delay-duration="0" :open="showOfflineSuffixPrev">
-                            <UFormField label="离线QQ后缀">
+                            <UFormField label="离线QQ后缀" name="offline_qq_suffix">
                                 <UInput v-model="formState.offline_qq_suffix" placeholder="| {s}离线"
                                     @pointerenter="showOfflineSuffixPrev = true"
                                     @pointerleave="showOfflineSuffixPrev = false" />
@@ -134,7 +135,7 @@ onMounted(() => {
 
         <UCard>
             <template #header>
-                <h2 class="text-lg font-semibold text-red-500">危险区域</h2>
+                <h2 class="text-lg font-semibold text-red-500">会话操作</h2>
             </template>
             <div class="flex items-center justify-between">
                 <div>
