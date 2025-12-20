@@ -4,6 +4,7 @@ import { useStorage } from '@vueuse/core'
 
 export const useData = () => {
     const { usePanelApi } = useApi()
+    const { hiddenServers } = useUi()
     const serverProfiles = useStorage<Record<string, ServerProfile>>('data_server_profiles', {})
 
     const checkServerProfiles = async (serverInfoList: ServerInfo[]) => {
@@ -18,6 +19,7 @@ export const useData = () => {
                     delete serverProfiles.value[info.id]
                 }
             }
+            if (info.id in hiddenServers.value) continue
             missingProfiles.push(info.id)
         }
         if (missingProfiles.length) {
@@ -31,6 +33,8 @@ export const useData = () => {
         for (const i of serverInfoList) {
             if (i.id in serverProfiles.value) {
                 existServerInfo.push(i)
+            } else {
+                hiddenServers.value.add(i.id)
             }
         }
         return existServerInfo
